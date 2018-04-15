@@ -7,8 +7,7 @@
 #include <curses.h>
 #include <cstdlib>
 #include <unistd.h>
-#include <string.h>
-//#include <string.h>
+
 
 
 /*-------------------------------------------------------------------*
@@ -20,7 +19,7 @@
 //determines the size of the map
 #define ROWS 20
 #define COLUMNS 20
-#define SNAKE_MAX_LEN 10
+#define SNAKE_MAX_LEN 5
 
 void map_filler (struct cell_info map[ROWS][COLUMNS]);
 void draw_static (WINDOW *local_win);
@@ -36,7 +35,6 @@ struct cell_info {
 	   int future_status;
 	   int snake_head;
 	   int snake_body;
-	   int snake_direction;
 };
 
 
@@ -49,27 +47,23 @@ class Snake{
 		int snake_length;
 		int snake_head_var[2];
 		int snake_tail_var[2];	
-		int snake_body_var[2];	
 		int snake_old_head_var[2];	
 		int last_dir;
 	
 	public:
-		void set_head_location (int loc_x, int loc_y);
+		void set_head_location (struct cell_info map[ROWS][COLUMNS], int loc_x, int loc_y);
 		void move_snake (struct cell_info map[ROWS][COLUMNS]);
 	
 
 };
 
-void Snake::set_head_location (int loc_x, int loc_y){
+void Snake::set_head_location (struct cell_info map[ROWS][COLUMNS], int loc_x, int loc_y){
+	
 	
 	snake_head_var[0] = loc_y;
 	snake_head_var[1] = loc_x;
-	snake_tail_var[0] = -1;
-	snake_tail_var[1] = -1;
-	snake_body_var[1] = -1;
-	snake_body_var[1] = -1;
+	map[snake_head_var[0]][snake_head_var[1]].current_status == 0;
 	last_dir = 0;
-	
 	snake_length = 0;
 }
 
@@ -78,7 +72,6 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 	
 	snake_old_head_var[0] = snake_head_var[0];
 	snake_old_head_var[1] = snake_head_var[1];
-	map[snake_head_var[0]][snake_head_var[1]].snake_head = 0;
 	
 	//check for legal direction
 	do{
@@ -91,104 +84,128 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 				
 				legal_direction = 0;
 		}
+		switch (direction){
+			case 2:
+				snake_head_var[0]++;
+				last_dir = 8;
+				mvprintw(40, 40, "2");
+				break;		
+			
+			case 4:
+				snake_head_var[1]--;
+				last_dir = 6;
+				mvprintw(40, 40, "4");
+				break;		
+			
+			case 6:
+				snake_head_var[1]++;
+				last_dir = 4;
+				mvprintw(40, 40, "6");
+				break;		
+			
+			case 8:
+				snake_head_var[0]--;
+				last_dir = 2;
+				mvprintw(40, 40, "8");
+				break;
+			default:
+				break;
+		
+		}
+		if (map[snake_head_var[0]][snake_head_var[1]].snake_body == 1){
+			snake_head_var[0] = snake_old_head_var[0];
+			snake_head_var[1] = snake_old_head_var[1];
+			legal_direction = 0;
+			
+		}
 	}
 	
 	while(!legal_direction);
 	
-	switch (direction){
-		case 2:
-			snake_head_var[0]++;
-			last_dir = 8;
-			mvprintw(40, 40, "2");
-			break;		
-		
-		case 4:
-			snake_head_var[1]--;
-			last_dir = 6;
-			mvprintw(40, 40, "4");
-			break;		
-		
-		case 6:
-			snake_head_var[1]++;
-			last_dir = 4;
-			mvprintw(40, 40, "6");
-			break;		
-		
-		case 8:
-			snake_head_var[0]--;
-			last_dir = 2;
-			mvprintw(40, 40, "8");
-			break;
-		default:
-			break;
-		
-	}
-	/*
-	-aseta pää
-	-poista vanha pää
 
-	-aseta häntä vanhaksi bodyksi
 	
-	
-	
-	
-	*/
 	if(map[snake_head_var[0]][snake_head_var[1]].current_status == 1){
 		
 		map[snake_head_var[0]][snake_head_var[1]].current_status = 0;
-		map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
-		map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
-		
-
-		
 		//if there's existing tail
-		if (snake_length > 0 && snake_length < 10){
-			//laita vanhan poään paikalle body
+		if (snake_length > 0 && snake_length < SNAKE_MAX_LEN){
+			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
+			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 0;
-			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			snake_tail_var [0] = snake_body_var[0];
-			snake_tail_var [1] = snake_body_var[1];
+			snake_tail_var[0] = snake_old_head_var[0];
+			snake_tail_var[1] = snake_old_head_var[1];
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
+			
 			snake_length++;
+			mvprintw(41, 40, "tail exists and ate creature");
 			
 		}
 		else if (snake_length > SNAKE_MAX_LEN){
 
+			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
+			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 0;
-			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			snake_tail_var [0] = snake_body_var[0];
-			snake_tail_var [1] = snake_body_var[1];
+			snake_tail_var[0] = snake_old_head_var[0];
+			snake_tail_var[1] = snake_old_head_var[1];
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
+			mvprintw(41, 40, "tail exists and max length and ate creature");
 		}
 		
 		else {
-			//laita vanhan pään tilalle body
+			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
+			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			//päivitä bodyn paikka
-			snake_body_var [0] = snake_old_head_var[0];
-			snake_body_var [1] = snake_old_head_var[1];			
+			snake_tail_var[0] = snake_old_head_var[0];
+			snake_tail_var[1] = snake_old_head_var[1];
 			snake_length++;
+			mvprintw(41, 40, "no tail and ate creature");
 		}
 		
-		mvprintw(41, 40, "Length %d ", snake_length);
+		mvprintw(42, 40, "Length %d ", snake_length);
 	}
+	
+	//if there's no life in cell
 	else {
 	
-		map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 0;
-		map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-		snake_tail_var [0] = snake_body_var[0];
-		snake_tail_var [1] = snake_body_var[1];
-		map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
+		if (snake_length > 0){
+			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
+			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
+			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 0;
+			snake_tail_var[0] = snake_old_head_var[0];
+			snake_tail_var[1] = snake_old_head_var[1];
+			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
+			mvprintw(41, 40, "tail and no creature");
+			
+		}
+		
+		else if (snake_length > SNAKE_MAX_LEN){
+
+			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
+			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
+			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 0;
+			snake_tail_var[0] = snake_old_head_var[0];
+			snake_tail_var[1] = snake_old_head_var[1];
+			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
+			mvprintw(41, 40, "tail exists and max length and no creature");
+		}
+		
+		else{
+			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
+			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
+			
+			mvprintw(41, 40, "no tail and no creature");
+			
+		}
+		
 	}
 	
 }
-
 
 int main() {
 	
 	srand( time(NULL) ); //Randomize seed initialization for map_fill
 	
-	int snake[SNAKE_MAX_LEN];
+
 	
 	//snake init
 	Snake testi;
@@ -202,7 +219,7 @@ int main() {
 	WINDOW* map_window = newwin(ROWS + 2, COLUMNS + 2, 0, 0);
 	WINDOW* console_window = newwin(30, 30, 30, 30);
 	draw_static (map_window); 
-	testi.set_head_location(10,10);
+	testi.set_head_location(new_map, 10,10);
 	
 	char testip[] = "xyz";
 	
@@ -210,12 +227,14 @@ int main() {
 	while(true){
 
 		draw_creatures (new_map, map_window);
+		draw_static (map_window); 
 		testi.move_snake(new_map);
 		refresh();
 		wrefresh(map_window);
 		wrefresh(console_window);
-		console_message (console_window, testip);
-		sleep_for_seconds(0.2);
+		//console_message (console_window, testip);
+		sleep_for_seconds(1);
+		werase(map_window);
 		
 	}
 	endwin();
@@ -226,60 +245,22 @@ int main() {
 }/* end of main */
 
 
-void array_shift(int arr[], int len, int dir){
-	int i, temp_array[100], temp, last;
-
-	switch(dir){
-		case 1:
-			for (i=0; i < len; i++){
-				temp = arr[i];
-				temp_array[i] = temp;
-			}
-			
-			for(i = 0; i < len; i++){
-				if(i < len - 1){
-					temp = temp_array[i];
-					arr[i+1] = temp;
-				}
-				else{
-					temp = temp_array[len];
-					arr[0] = temp;
-				}
-			}
-			break;
-		case -1:
-			for (i=0; i < len; i++){
-				temp = arr[i];
-				temp_array[i] = temp;
-			}
-			
-			for(i = len; i > 0; i--){
-				last = arr[len];
-				if(i > 0){
-					temp = temp_array[i];
-					arr[i-1] = temp;
-				}
-				else{
-					//temp = temp_array[0];
-					arr[len] = last;
-				}
-			}
-			break;
-	}
-}
-
-
 void map_filler (struct cell_info map[ROWS][COLUMNS]){
 	int i, j;
 	
 	for(i = 0; i < ROWS; i++){
 		for(j = 0; j < COLUMNS; j++){
-			//map[i][j][0] = random_value_filler ();
-			//tayta nollilla tassa tapauksessa
+			if (j % 2 == 0 && i % 2 == 0){
 			map[i][j].current_status = 1;
-			map[i][j].future_status = 0;
 			map[i][j].snake_head = 0;
 			map[i][j].snake_body = 0;
+			}
+			else {
+				
+			map[i][j].current_status = 0;
+			map[i][j].snake_head = 0;
+			map[i][j].snake_body = 0;
+			}
 		}
 	}
 }
@@ -327,19 +308,19 @@ void draw_creatures (struct cell_info map[ROWS][COLUMNS], WINDOW *local_win){
 				mvwprintw(local_win, i+1, j+1, "@");
 				wattroff(local_win, COLOR_PAIR(1));	
 			}			
-			else if (map[i][j].snake_head == 1){
+			if (map[i][j].snake_head == 1){
 				wattron(local_win, COLOR_PAIR(2));
 				mvwprintw(local_win, i+1, j+1, "X");
 				wattroff(local_win, COLOR_PAIR(2));	
 			}			
 			
-			else if (map[i][j].snake_body == 1){
+			if (map[i][j].snake_body == 1){
 				wattron(local_win, COLOR_PAIR(2));
 				mvwprintw(local_win, i+1, j+1, "I");
 				wattroff(local_win, COLOR_PAIR(2));	
 			}
 
-			else{
+			else if (map[i][j].current_status == 0 && map[i][j].snake_body == 0 && map[i][j].snake_head == 0){
 				wattron(local_win, COLOR_PAIR(3));
 				mvwprintw(local_win, i+1, j+1, ".");
 				wattroff(local_win, COLOR_PAIR(3));	
