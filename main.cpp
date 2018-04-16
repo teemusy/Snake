@@ -8,8 +8,6 @@
 #include <cstdlib>
 #include <unistd.h>
 
-
-
 /*-------------------------------------------------------------------*
 *    GLOBAL VARIABLES                                                *
 *--------------------------------------------------------------------*/
@@ -32,15 +30,10 @@ int random_value_filler ();
 
 struct cell_info {
 	   int current_status;
-	   int future_status;
+	   //int future_status;
 	   int snake_head;
 	   int snake_body;
 };
-
-
-
-
-
 
 class Snake{
 	private:
@@ -53,13 +46,9 @@ class Snake{
 	public:
 		void set_head_location (struct cell_info map[ROWS][COLUMNS], int loc_x, int loc_y);
 		void move_snake (struct cell_info map[ROWS][COLUMNS]);
-	
-
 };
 
 void Snake::set_head_location (struct cell_info map[ROWS][COLUMNS], int loc_x, int loc_y){
-	
-	
 	snake_head_var[0] = loc_y;
 	snake_head_var[1] = loc_x;
 	map[snake_head_var[0]][snake_head_var[1]].current_status == 0;
@@ -72,7 +61,6 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 	
 	snake_old_head_var[0] = snake_head_var[0];
 	snake_old_head_var[1] = snake_head_var[1];
-	
 	//check for legal direction
 	do{
 		direction = random_value_filler ();
@@ -122,10 +110,7 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 	
 	while(!legal_direction);
 	
-
-	
 	if(map[snake_head_var[0]][snake_head_var[1]].current_status == 1){
-		
 		map[snake_head_var[0]][snake_head_var[1]].current_status = 0;
 		//if there's existing tail
 		if (snake_length > 0 && snake_length < SNAKE_MAX_LEN){
@@ -135,7 +120,6 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			snake_tail_var[0] = snake_old_head_var[0];
 			snake_tail_var[1] = snake_old_head_var[1];
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
-			
 			snake_length++;
 			mvprintw(41, 40, "tail exists and ate creature");
 			
@@ -166,7 +150,6 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 	
 	//if there's no life in cell
 	else {
-	
 		if (snake_length > 0){
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
@@ -175,11 +158,8 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			snake_tail_var[1] = snake_old_head_var[1];
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 1;
 			mvprintw(41, 40, "tail and no creature");
-			
 		}
-		
 		else if (snake_length > SNAKE_MAX_LEN){
-
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
 			map[snake_tail_var[0]][snake_tail_var[1]].snake_body = 0;
@@ -192,26 +172,16 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 		else{
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;
-			
 			mvprintw(41, 40, "no tail and no creature");
-			
 		}
-		
 	}
-	
 }
 
 int main() {
-	
 	srand( time(NULL) ); //Randomize seed initialization for map_fill
-	
-
-	
 	//snake init
 	Snake testi;
 	struct cell_info new_map[ROWS][COLUMNS];
-	
-
 	map_filler (new_map);
 	initscr(); //ncurses init
 	curs_set(0);
@@ -220,12 +190,10 @@ int main() {
 	WINDOW* console_window = newwin(30, 30, 30, 30);
 	draw_static (map_window); 
 	testi.set_head_location(new_map, 10,10);
-	
 	char testip[] = "xyz";
 	
 	//MAIN LOOP
 	while(true){
-
 		draw_creatures (new_map, map_window);
 		draw_static (map_window); 
 		testi.move_snake(new_map);
@@ -235,15 +203,10 @@ int main() {
 		//console_message (console_window, testip);
 		sleep_for_seconds(1);
 		werase(map_window);
-		
 	}
 	endwin();
-	return 0;
-
-
-	
+	return 0;	
 }/* end of main */
-
 
 void map_filler (struct cell_info map[ROWS][COLUMNS]){
 	int i, j;
@@ -267,9 +230,8 @@ void map_filler (struct cell_info map[ROWS][COLUMNS]){
 
 int random_value_filler (){
 	int random_value;
-	
+
 	random_value = (rand() % 100) + 1;
-	
 	if (random_value < 25){
 		random_value = 2;
 	}	
@@ -284,11 +246,8 @@ int random_value_filler (){
 	else {
 		random_value = 8;
 	}
-	
 	return random_value;
 }
-
-
 
 void draw_creatures (struct cell_info map[ROWS][COLUMNS], WINDOW *local_win){
 	int i, j;
@@ -324,11 +283,10 @@ void draw_creatures (struct cell_info map[ROWS][COLUMNS], WINDOW *local_win){
 				wattron(local_win, COLOR_PAIR(3));
 				mvwprintw(local_win, i+1, j+1, ".");
 				wattroff(local_win, COLOR_PAIR(3));	
-				
+			
 			}
 		}
 	}
-	
 }
 
 void console_message (WINDOW *local_win, char *message){
@@ -345,7 +303,6 @@ void console_message (WINDOW *local_win, char *message){
 		mvwprintw(local_win, i, 1, "%s", message);
 		wattroff(local_win, COLOR_PAIR(1));	
 	}
-
 }
 
 void draw_static (WINDOW *local_win){
@@ -372,6 +329,5 @@ void draw_static (WINDOW *local_win){
 
 void sleep_for_seconds (float s){ 
 	int sec = s*1000000; 
-	
 	usleep(sec); 
 } 
