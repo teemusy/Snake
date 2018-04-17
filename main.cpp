@@ -75,13 +75,7 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 	do{
 		direction = random_value_filler ();
 		legal_direction = 1;
-		if(((snake_head_var[1] == COLUMNS && direction == 6) ||
-			(snake_head_var[1] == 0 && direction == 4) ||
-			(snake_head_var[0] == ROWS && direction == 2) ||
-			(snake_head_var[0] == 0 && direction == 8)) && last_dir != direction){
-				
-				legal_direction = 0;
-		}
+
 		switch (direction){
 			case 2:
 				snake_head_var[0]++;
@@ -110,11 +104,20 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 				break;
 		
 		}
+		
 		if (map[snake_head_var[0]][snake_head_var[1]].snake_body == 1){
 			snake_head_var[0] = snake_old_head_var[0];
 			snake_head_var[1] = snake_old_head_var[1];
 			legal_direction = 0;
-			
+		}
+		
+		if(((snake_head_var[1] == COLUMNS && direction == 6) ||
+			(snake_head_var[1] < 0 && direction == 4) ||
+			(snake_head_var[0] == ROWS && direction == 2) ||
+			(snake_head_var[0] < 0 && direction == 8))){
+				snake_head_var[0] = snake_old_head_var[0];
+				snake_head_var[1] = snake_old_head_var[1];
+				legal_direction = 0;
 		}
 	}
 	while(!legal_direction);
@@ -129,13 +132,9 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
 			map[snake_location[0][snake_length]][snake_location[1][snake_length]].snake_body = 0;
-			//siirrä oikealle ja lisää nollapaikalle pään entinen osoite
 			array_shift(snake_location, SNAKE_MAX_LEN, 1);
-			
 			snake_location[0][0] = snake_old_head_var[0];
 			snake_location[1][0] = snake_old_head_var[1];
-			
-			
 			snake_length++;
 			mvprintw(41, 40, "tail exists and ate creature");
 			
@@ -146,14 +145,10 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
 			map[snake_location[0][SNAKE_MAX_LEN-1]][snake_location[1][SNAKE_MAX_LEN-1]].snake_body = 0;
-			//siirrä oikealle ja lisää nollapaikalle pään entinen osoite
 			array_shift(snake_location, SNAKE_MAX_LEN, 1);
-			
 			snake_location[0][0] = snake_old_head_var[0];
 			snake_location[1][0] = snake_old_head_var[1];
 			
-			
-
 			mvprintw(41, 40, "tail exists and max length and ate creature");
 		}
 		
@@ -163,14 +158,14 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			
 			snake_location[0][0] = snake_old_head_var[0];
 			snake_location[1][0] = snake_old_head_var[1];
 			snake_length++;
 			mvprintw(41, 40, "no tail and ate creature");
 		}
 		
-		mvprintw(42, 40, "Length %d ", snake_length);
+		
+		
 	}
 	
 	//if there's no life in cell
@@ -179,15 +174,10 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			map[snake_location[0][snake_length]][snake_location[1][snake_length]].snake_body = 0;
-			//siirrä oikealle ja lisää nollapaikalle pään entinen osoite
+			map[snake_location[0][snake_length-1]][snake_location[1][snake_length-1]].snake_body = 0;
 			array_shift(snake_location, SNAKE_MAX_LEN, 1);
-			//lisää nollapaikalle 
 			snake_location[0][0] = snake_old_head_var[0];
 			snake_location[1][0] = snake_old_head_var[1];
-			
-			
-
 			mvprintw(41, 40, "tail and no creature");
 		}
 		else if (snake_length >= SNAKE_MAX_LEN){
@@ -195,9 +185,7 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
 			map[snake_location[0][SNAKE_MAX_LEN-1]][snake_location[1][SNAKE_MAX_LEN-1]].snake_body = 0;
-			//siirrä oikealle ja lisää nollapaikalle pään entinen osoite
 			array_shift(snake_location, SNAKE_MAX_LEN, 1);
-			
 			snake_location[0][0] = snake_old_head_var[0];
 			snake_location[1][0] = snake_old_head_var[1];
 			
@@ -214,6 +202,8 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			mvprintw(41, 40, "no tail and no creature");
 		}
 	}
+	mvprintw(42, 40, "Length %d ", snake_length);
+	mvprintw(43, 40, "Snake row: %d column %d", snake_head_var[0], snake_head_var[1]);
 }
 
 int main() {
@@ -225,7 +215,7 @@ int main() {
 	initscr(); //ncurses init
 	curs_set(0);
 	start_color();
-	WINDOW* map_window = newwin(ROWS + 2, COLUMNS + 2, 0, 0);
+	WINDOW* map_window = newwin(ROWS, COLUMNS, 0, 0);
 	WINDOW* console_window = newwin(30, 30, 30, 30);
 	//draw_static (map_window); 
 	testi.set_head_location(new_map, 10,10);
@@ -241,7 +231,7 @@ int main() {
 		wrefresh(map_window);
 		wrefresh(console_window);
 		//console_message (console_window, testip);
-		sleep_for_seconds(1);
+		sleep_for_seconds(0.1);
 		werase(map_window);
 	}
 	endwin();
