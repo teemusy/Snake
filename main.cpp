@@ -145,7 +145,7 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			map[snake_location[0][SNAKE_MAX_LEN]][snake_location[1][SNAKE_MAX_LEN]].snake_body = 0;
+			map[snake_location[0][SNAKE_MAX_LEN-1]][snake_location[1][SNAKE_MAX_LEN-1]].snake_body = 0;
 			//siirrä oikealle ja lisää nollapaikalle pään entinen osoite
 			array_shift(snake_location, SNAKE_MAX_LEN, 1);
 			
@@ -175,7 +175,7 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 	
 	//if there's no life in cell
 	else {
-		if (snake_length > 0){
+		if (snake_length > 0 && snake_length < SNAKE_MAX_LEN){
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
@@ -194,7 +194,7 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_head = 0;
 			map[snake_head_var[0]][snake_head_var[1]].snake_head = 1;	
 			map[snake_old_head_var[0]][snake_old_head_var[1]].snake_body = 1;
-			map[snake_location[0][SNAKE_MAX_LEN]][snake_location[1][SNAKE_MAX_LEN]].snake_body = 0;
+			map[snake_location[0][SNAKE_MAX_LEN-1]][snake_location[1][SNAKE_MAX_LEN-1]].snake_body = 0;
 			//siirrä oikealle ja lisää nollapaikalle pään entinen osoite
 			array_shift(snake_location, SNAKE_MAX_LEN, 1);
 			
