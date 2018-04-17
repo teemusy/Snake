@@ -17,7 +17,7 @@
 //determines the size of the map
 #define ROWS 20
 #define COLUMNS 20
-#define SNAKE_MAX_LEN 5
+#define SNAKE_MAX_LEN 20
 
 void map_filler (struct cell_info map[ROWS][COLUMNS]);
 void draw_static (WINDOW *local_win);
@@ -45,6 +45,7 @@ class Snake{
 		int snake_old_head_var[2];	
 		int last_dir;
 		int snake_location[2][SNAKE_MAX_LEN];
+		int n, e, s, w;
 	
 	public:
 		void set_head_location (struct cell_info map[ROWS][COLUMNS], int loc_x, int loc_y);
@@ -76,29 +77,44 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 		direction = random_value_filler ();
 		legal_direction = 1;
 
+		//>75% chance to choose last direction for more natural movement
+		
+		if (direction != 8){
+		
+			direction = last_dir;
+		}
+		else {
+			direction = random_value_filler ();
+			
+		}
+		
 		switch (direction){
 			case 2:
 				snake_head_var[0]++;
 				last_dir = 8;
 				mvprintw(40, 40, "2");
+				
 				break;		
 			
 			case 4:
 				snake_head_var[1]--;
 				last_dir = 6;
 				mvprintw(40, 40, "4");
+				
 				break;		
 			
 			case 6:
 				snake_head_var[1]++;
 				last_dir = 4;
 				mvprintw(40, 40, "6");
+				
 				break;		
 			
 			case 8:
 				snake_head_var[0]--;
 				last_dir = 2;
 				mvprintw(40, 40, "8");
+
 				break;
 			default:
 				break;
@@ -108,6 +124,23 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 		if (map[snake_head_var[0]][snake_head_var[1]].snake_body == 1){
 			snake_head_var[0] = snake_old_head_var[0];
 			snake_head_var[1] = snake_old_head_var[1];
+
+					switch (last_dir){
+			case (2):
+				n++;
+				break;				
+			case (4):
+				e++;
+				break;				
+			case (6):
+				w++;
+				break;				
+			case (8):
+				s++;
+				break;
+			default:
+				break;
+		}
 			legal_direction = 0;
 		}
 		
@@ -117,10 +150,41 @@ void Snake::move_snake (struct cell_info map[ROWS][COLUMNS]){
 			(snake_head_var[0] < 0 && direction == 8))){
 				snake_head_var[0] = snake_old_head_var[0];
 				snake_head_var[1] = snake_old_head_var[1];
+						switch (last_dir){
+			case (2):
+				n++;
+				break;				
+			case (4):
+				e++;
+				break;				
+			case (6):
+				w++;
+				break;				
+			case (8):
+				s++;
+				break;
+			default:
+				break;
+		}
 				legal_direction = 0;
+				
+				
+				
+		}
+		
+
+		
+		if (n > 0 && e > 0  && s > 0  && w > 0 ){
+			mvprintw(45, 40, "tiltti");
+			
 		}
 	}
 	while(!legal_direction);
+	
+	n = 0;
+	e = 0;
+	s = 0;
+	w = 0;
 	
 	if(map[snake_head_var[0]][snake_head_var[1]].current_status == 1){
 		map[snake_head_var[0]][snake_head_var[1]].current_status = 0;
